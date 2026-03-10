@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Güvenior.Application\Güvenior.Application.csproj" />
+    <ProjectReference Include="..\Güvenior.Domain\Güvenior.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="AI\" />
+    <Folder Include="External\" />
+  </ItemGroup>
+
+</Project>
