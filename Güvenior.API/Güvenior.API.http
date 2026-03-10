@@ -1,0 +1,6 @@
+@Güvenior.API_HostAddress = http://localhost:5219
+
+GET {{Güvenior.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
