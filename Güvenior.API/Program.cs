@@ -66,4 +66,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+Güvenior.Infrastructure.Persistence.DatabaseInitializer.MigrateDatabase(app.Services);
+
 app.Run();
