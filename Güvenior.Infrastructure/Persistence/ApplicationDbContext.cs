@@ -1,23 +1,25 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Güvenior.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Güvenior.Domain.Entities;
 
 namespace Güvenior.Infrastructure.Persistence;
 
-// Burası artık IdentityDbContext<User> oldu. 
-// Bu sayede "Users" tablosu zaten Identity tarafından yönetilecek.
 public class ApplicationDbContext : IdentityDbContext<User>
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-
-    // DİKKAT: DbSet<User> yazmana artık gerek yok, IdentityDbContext bunu senin için hallediyor.
-    public DbSet<Transaction> Transactions { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
-        // Identity tablolarının konfigürasyonu için bu satır ÇOK önemlidir, silme:
-        base.OnModelCreating(modelBuilder);
-        
-        // Buraya ileride Transaction tablosu için özel kısıtlamalar ekleyebiliriz.
+    }
+
+    public DbSet<Income> Incomes => Set<Income>();
+    public DbSet<Expense> Expenses => Set<Expense>();
+    public DbSet<Budget> Budgets => Set<Budget>();
+    public DbSet<Insight> Insights => Set<Insight>();
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 }

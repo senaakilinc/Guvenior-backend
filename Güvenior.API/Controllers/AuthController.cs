@@ -1,83 +1,31 @@
-using Microsoft.AspNetCore.Identity;
+using Güvenior.Application.DTOs.Auth;
+using Güvenior.Application.Features.Auth;
 using Microsoft.AspNetCore.Mvc;
-using Güvenior.Domain.Entities;
-using Güvenior.API.DTOs;
-using System.IdentityModel.Tokens.Jwt; // Bunu ekle
-using System.Security.Claims; // Bunu ekle
-using Microsoft.IdentityModel.Tokens; // Bunu ekle
-using System.Text; // Bunu ekle
 
 namespace Güvenior.API.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly UserManager<User> _userManager;
+    private readonly AuthService _authService;
 
-    public AuthController(UserManager<User> userManager)
+    public AuthController(AuthService authService)
     {
-        _userManager = userManager;
+        _authService = authService;
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+    public async Task<IActionResult> Register(RegisterDto dto)
     {
-        var user = new User
-        {
-            UserName = registerDto.Email,
-            Email = registerDto.Email,
-            FullName = registerDto.FullName,
-            MonthlyIncome = registerDto.MonthlyIncome,
-            SalaryDay = registerDto.SalaryDay
-        };
-
-        var result = await _userManager.CreateAsync(user, registerDto.Password);
-
-        if (result.Succeeded)
-        {
-            return Ok("Kullanıcı başarıyla oluşturuldu.");
-        }
-
-        return BadRequest(result.Errors);
+        var result = await _authService.RegisterAsync(dto);
+        return Ok(result);
     }
 
-    // --- BURASI YENİ: LOGIN METODU ---
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+    public async Task<IActionResult> Login(LoginDto dto)
     {
-        var user = await _userManager.FindByEmailAsync(loginDto.Email);
-        
-        // Kullanıcı var mı ve şifre doğru mu kontrol et
-        if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
-        {
-            // Token içine gömülecek bilgiler (Claims)
-            var authClaims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.FullName),
-                new Claim(ClaimTypes.Email, user.Email!),
-                new Claim(ClaimTypes.NameIdentifier, user.Id), // UserId çok önemli
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            };
-
-            // Program.cs'deki anahtarın aynısı olmalı!
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("BuCokGizliVeUzunBirAnahtarCumlesi123!"));
-
-            var token = new JwtSecurityToken(
-                issuer: "Guvenior",
-                audience: "GuveniorUsers",
-                expires: DateTime.Now.AddHours(3), // 3 saat geçerli
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-            );
-
-            return Ok(new
-            {
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = token.ValidTo
-            });
-        }
-        
-        return Unauthorized("E-posta veya şifre hatalı.");
+        var result = await _authService.LoginAsync(dto);
+        return Ok(result);
     }
 }
