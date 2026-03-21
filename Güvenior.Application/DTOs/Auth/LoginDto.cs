@@ -1,4 +1,4 @@
-namespace Güvenior.API.DTOs;
+namespace Güvenior.Application.DTOs.Auth;
 
 public class LoginDto
 {

@@ -368,3 +368,20 @@ appsettings.Development.json
 # PostgreSQL veya SQLite geçici dosyaları (eğer oluşursa)
 *.db
 *.local
+
+# macOS
+.DS_Store
+
+# JetBrains Rider / IntelliJ
+.idea/
+
+# VS Code local workspace settings
+.vscode/
+
+# Local dotnet CLI cache
+.dotnet/
+
+# Environment files
+.env
+.env.*
+!.env.example
