@@ -1,5 +1,6 @@
 using Güvenior.Application.Common.Interfaces;
 using Güvenior.Domain.Entities;
+using Güvenior.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Güvenior.Infrastructure.Persistence.Repositories;
@@ -22,9 +23,21 @@ public class BudgetRepository : IBudgetRepository
     public async Task<List<Budget>> GetByUserIdAsync(string userId)
     {
         return await _context.Budgets
-            .Where(x => x.UserId == userId)
-            .OrderByDescending(x => x.Year)
-            .ThenByDescending(x => x.Month)
+            .Where(b => b.UserId == userId)
             .ToListAsync();
+    }
+    public async Task<Budget?> GetByUserCategoryAndMonthAsync(string userId, ExpenseCategory category, int month, int year)
+    {
+        return await _context.Budgets
+            .FirstOrDefaultAsync(b =>
+                b.UserId == userId &&
+                b.Category == category &&
+                b.Month == month &&
+                b.Year == year);
+    }
+    public async Task UpdateAsync(Budget budget)
+    {
+        _context.Budgets.Update(budget);
+        await _context.SaveChangesAsync();
     }
 }
