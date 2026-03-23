@@ -1,6 +1,7 @@
 using System.Text;
 using Güvenior.Application.Common.Interfaces;
 using Güvenior.Application.Features.Auth;
+using Güvenior.Application.Features.Budget;
 using Güvenior.Application.Features.Expense;
 using Güvenior.Application.Features.Income;
 using Güvenior.Domain.Entities;
@@ -71,6 +72,7 @@ builder.Services.AddScoped<IInsightRepository, InsightRepository>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IncomeService>();
 builder.Services.AddScoped<ExpenseService>();
+builder.Services.AddScoped<BudgetService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
