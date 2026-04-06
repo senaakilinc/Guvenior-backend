@@ -361,3 +361,27 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Arkadaşlarının şifreleri seninkinden farklı olacağı için bu dosyayı herkes yerel tutmalı
+appsettings.Development.json
+
+# PostgreSQL veya SQLite geçici dosyaları (eğer oluşursa)
+*.db
+*.local
+
+# macOS
+.DS_Store
+
+# JetBrains Rider / IntelliJ
+.idea/
+
+# VS Code local workspace settings
+.vscode/
+
+# Local dotnet CLI cache
+.dotnet/
+
+# Environment files
+.env
+.env.*
+!.env.example

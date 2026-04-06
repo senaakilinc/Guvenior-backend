@@ -46,6 +46,7 @@ public class AuthService
             FullName = user.FullName,
             MonthlyIncome = user.MonthlyIncome,
             SalaryDay = user.SalaryDay
+            
         };
     }
 
@@ -102,6 +103,7 @@ public class AuthService
             FullName = user.FullName,
             MonthlyIncome = user.MonthlyIncome,
             SalaryDay = user.SalaryDay
+            
         };
     }
 }
