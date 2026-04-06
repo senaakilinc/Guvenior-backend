@@ -1,8 +1,21 @@
+using System.Text;
+using Güvenior.Application.Common.Interfaces;
+using Güvenior.Application.Features.Auth;
+using Güvenior.Application.Features.Budget;
+using Güvenior.Application.Features.Expense;
+using Güvenior.Application.Features.Income;
+using Güvenior.Domain.Entities;
+using Güvenior.Infrastructure.Persistence;
+using Güvenior.Infrastructure.Persistence.Repositories;
+using Güvenior.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
-<<<<<<< Updated upstream
-// Add services to the container.
-=======
 // DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -73,16 +86,46 @@ builder.Services.AddScoped<IncomeService>();
 builder.Services.AddScoped<ExpenseService>();
 builder.Services.AddScoped<RecurringExpenseService>();
 builder.Services.AddScoped<BudgetService>();
->>>>>>> Stashed changes
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Güvenior.API",
+        Version = "v1"
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT token giriniz. Örnek: Bearer eyJhbGciOi..."
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -91,16 +134,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors();
 app.UseHttpsRedirection();
-<<<<<<< Updated upstream
-
-=======
 app.UseAuthentication();
->>>>>>> Stashed changes
 app.UseAuthorization();
 app.MapControllers();
-<<<<<<< Updated upstream
 
 app.Run();
-=======
-app.Run();
->>>>>>> Stashed changes
