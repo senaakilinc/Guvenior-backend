@@ -33,6 +33,12 @@ public class RecurringExpenseRepository : IRecurringExpenseRepository
         return recurringExpense;
     }
 
+    public async Task UpdateAsync(RecurringExpense recurringExpense)
+    {
+        _context.RecurringExpenses.Update(recurringExpense);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task DeleteAsync(RecurringExpense recurringExpense)
     {
         _context.RecurringExpenses.Remove(recurringExpense);

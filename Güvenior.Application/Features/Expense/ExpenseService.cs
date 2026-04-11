@@ -31,4 +31,36 @@ public class ExpenseService
     {
         return await _expenseRepository.GetByUserIdAsync(userId);
     }
+
+    public async Task<ExpenseEntity?> UpdateAsync(int id, string userId, UpdateExpenseDto dto)
+    {
+        var expense = await _expenseRepository.GetByIdAsync(id);
+        if (expense == null || expense.UserId != userId)
+            return null;
+
+        if (!string.IsNullOrWhiteSpace(dto.Title))
+            expense.Title = dto.Title;
+
+        if (dto.Amount.HasValue)
+            expense.Amount = dto.Amount.Value;
+
+        if (dto.Category.HasValue)
+            expense.Category = dto.Category.Value;
+
+        if (dto.SpentAt.HasValue)
+            expense.SpentAt = DateTime.SpecifyKind(dto.SpentAt.Value, DateTimeKind.Utc);
+
+        await _expenseRepository.UpdateAsync(expense);
+        return expense;
+    }
+
+    public async Task<bool> DeleteAsync(int id, string userId)
+    {
+        var expense = await _expenseRepository.GetByIdAsync(id);
+        if (expense == null || expense.UserId != userId)
+            return false;
+
+        await _expenseRepository.DeleteAsync(expense);
+        return true;
+    }
 }

@@ -3,7 +3,6 @@ using Güvenior.Application.Features.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Güvenior.API.Controllers;
 
@@ -32,6 +31,24 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
+    {
+        await _authService.ForgotPasswordAsync(dto);
+
+        return Ok(new
+        {
+            message = "Eger bu e-posta kayitliysa sifre sifirlama baglantisi gonderildi."
+        });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
+    {
+        await _authService.ResetPasswordAsync(dto);
+        return Ok(new { message = "Sifre basariyla yenilendi." });
+    }
+
     [Authorize]
     [HttpPut("update-salary")]
     public async Task<IActionResult> UpdateSalary([FromBody] UpdateSalaryDto dto)
@@ -41,7 +58,7 @@ public class AuthController : ControllerBase
             return Unauthorized();
 
         var user = await _authService.UpdateSalaryAsync(userId, dto);
-        return Ok(new { message = "Maaş güncellendi.", monthlyIncome = user.MonthlyIncome, salaryDay = user.SalaryDay });
+        return Ok(new { message = "Maas guncellendi.", monthlyIncome = user.MonthlyIncome, salaryDay = user.SalaryDay });
     }
 
     [Authorize]

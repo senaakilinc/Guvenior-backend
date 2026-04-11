@@ -9,13 +9,16 @@ public class AuthService
 {
     private readonly UserManager<User> _userManager;
     private readonly IJwtService _jwtService;
+    private readonly IEmailService _emailService;
 
     public AuthService(
         UserManager<User> userManager,
-        IJwtService jwtService)
+        IJwtService jwtService,
+        IEmailService emailService)
     {
         _userManager = userManager;
         _jwtService = jwtService;
+        _emailService = emailService;
     }
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
@@ -31,11 +34,11 @@ public class AuthService
 
         var result = await _userManager.CreateAsync(user, dto.Password);
 
-       if (!result.Succeeded)
-{
-    var errors = string.Join(" | ", result.Errors.Select(x => x.Description));
-    throw new Exception(errors);
-}
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(" | ", result.Errors.Select(x => x.Description));
+            throw new Exception(errors);
+        }
 
         var token = _jwtService.GenerateToken(user);
 
@@ -46,7 +49,6 @@ public class AuthService
             FullName = user.FullName,
             MonthlyIncome = user.MonthlyIncome,
             SalaryDay = user.SalaryDay
-            
         };
     }
 
@@ -55,12 +57,12 @@ public class AuthService
         var user = await _userManager.FindByEmailAsync(dto.Email);
 
         if (user == null)
-            throw new Exception("Kullanıcı yok");
+            throw new Exception("Kullanici yok");
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
 
         if (!isPasswordValid)
-            throw new Exception("Şifre yanlış");
+            throw new Exception("Sifre yanlis");
 
         var token = _jwtService.GenerateToken(user);
 
@@ -74,18 +76,48 @@ public class AuthService
         };
     }
 
+    public async Task ForgotPasswordAsync(ForgotPasswordDto dto)
+    {
+        var user = await _userManager.FindByEmailAsync(dto.Email);
+
+        if (user == null || string.IsNullOrWhiteSpace(user.Email))
+            return;
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var encodedToken = Uri.EscapeDataString(token);
+
+        await _emailService.SendPasswordResetEmailAsync(user, encodedToken);
+    }
+
+    public async Task ResetPasswordAsync(ResetPasswordDto dto)
+    {
+        var user = await _userManager.FindByEmailAsync(dto.Email);
+
+        if (user == null)
+            throw new Exception("Gecersiz islem.");
+
+        var decodedToken = Uri.UnescapeDataString(dto.Token);
+        var result = await _userManager.ResetPasswordAsync(user, decodedToken, dto.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(" | ", result.Errors.Select(x => x.Description));
+            throw new Exception(errors);
+        }
+    }
+
     public async Task<User> UpdateSalaryAsync(string userId, UpdateSalaryDto dto)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
-            throw new Exception("Kullanıcı bulunamadı");
+            throw new Exception("Kullanici bulunamadi");
 
         user.MonthlyIncome = dto.MonthlyIncome;
         user.SalaryDay = dto.SalaryDay;
 
         var result = await _userManager.UpdateAsync(user);
         if (!result.Succeeded)
-            throw new Exception("Maaş güncellenemedi");
+            throw new Exception("Maas guncellenemedi");
 
         return user;
     }
@@ -94,16 +126,15 @@ public class AuthService
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
-            throw new Exception("Kullanıcı bulunamadı");
+            throw new Exception("Kullanici bulunamadi");
 
         return new AuthResponseDto
         {
-            Token = string.Empty, // Token is not needed for profile fetch
+            Token = string.Empty,
             Email = user.Email!,
             FullName = user.FullName,
             MonthlyIncome = user.MonthlyIncome,
             SalaryDay = user.SalaryDay
-            
         };
     }
 }
