@@ -41,4 +41,40 @@ public class BudgetService
     {
         return await _budgetRepository.GetByUserIdAsync(userId);
     }
+
+    public async Task<BudgetEntity?> UpdateAsync(int id, string userId, UpdateBudgetDto dto)
+    {
+        var budget = await _budgetRepository.GetByIdAsync(id);
+        if (budget == null || budget.UserId != userId)
+            return null;
+
+        var nextCategory = dto.Category ?? budget.Category;
+        var nextMonth = dto.Month ?? budget.Month;
+        var nextYear = dto.Year ?? budget.Year;
+
+        var existing = await _budgetRepository.GetByUserCategoryAndMonthAsync(userId, nextCategory, nextMonth, nextYear);
+        if (existing != null && existing.Id != budget.Id)
+            throw new InvalidOperationException("Bu kategori ve ay için zaten bir bütçe mevcut.");
+
+        budget.Category = nextCategory;
+
+        if (dto.LimitAmount.HasValue)
+            budget.LimitAmount = dto.LimitAmount.Value;
+
+        budget.Month = nextMonth;
+        budget.Year = nextYear;
+
+        await _budgetRepository.UpdateAsync(budget);
+        return budget;
+    }
+
+    public async Task<bool> DeleteAsync(int id, string userId)
+    {
+        var budget = await _budgetRepository.GetByIdAsync(id);
+        if (budget == null || budget.UserId != userId)
+            return false;
+
+        await _budgetRepository.DeleteAsync(budget);
+        return true;
+    }
 }

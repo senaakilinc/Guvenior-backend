@@ -72,6 +72,7 @@ builder.Services.AddCors(options =>
 
 // DI - Infrastructure services
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // DI - Repositories
 builder.Services.AddScoped<IIncomeRepository, IncomeRepository>();
@@ -94,7 +95,7 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Güvenior.API",
+        Title = "Guvenior.API",
         Version = "v1"
     });
 
@@ -105,7 +106,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "JWT token giriniz. Örnek: Bearer eyJhbGciOi..."
+        Description = "JWT token giriniz. Ornek: Bearer eyJhbGciOi..."
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement

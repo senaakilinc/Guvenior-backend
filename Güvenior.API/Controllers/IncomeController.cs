@@ -41,4 +41,34 @@ public class IncomeController : ControllerBase
         var incomes = await _incomeService.GetByUserIdAsync(userId);
         return Ok(incomes);
     }
+
+    [HttpPatch("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateIncomeDto dto)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var income = await _incomeService.UpdateAsync(id, userId, dto);
+        if (income == null)
+            return NotFound("Gelir bulunamadı.");
+
+        return Ok(income);
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var deleted = await _incomeService.DeleteAsync(id, userId);
+        if (!deleted)
+            return NotFound("Gelir bulunamadı.");
+
+        return NoContent();
+    }
 }

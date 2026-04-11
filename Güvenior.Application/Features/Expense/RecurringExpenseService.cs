@@ -30,7 +30,7 @@ public class RecurringExpenseService
     public async Task<RecurringExpenseDto> GetByIdAsync(int id)
     {
         var expense = await _repository.GetByIdAsync(id);
-        if (expense == null) throw new Exception("Tapılamadı");
+        if (expense == null) throw new Exception("TapÄ±lamadÄ±");
 
         return new RecurringExpenseDto
         {
@@ -68,12 +68,47 @@ public class RecurringExpenseService
         };
     }
 
-    public async Task DeleteAsync(int id, string userId)
+    public async Task<RecurringExpenseDto?> UpdateAsync(int id, string userId, UpdateRecurringExpenseDto dto)
     {
         var expense = await _repository.GetByIdAsync(id);
         if (expense == null || expense.UserId != userId)
-            throw new Exception("Bulunamadı veya yetkisiz");
+            return null;
+
+        if (!string.IsNullOrWhiteSpace(dto.Title))
+            expense.Title = dto.Title;
+
+        if (dto.Amount.HasValue)
+            expense.Amount = dto.Amount.Value;
+
+        if (dto.Category.HasValue)
+            expense.Category = dto.Category.Value;
+
+        if (dto.DayOfMonth.HasValue)
+            expense.DayOfMonth = dto.DayOfMonth.Value;
+
+        if (dto.IsActive.HasValue)
+            expense.IsActive = dto.IsActive.Value;
+
+        await _repository.UpdateAsync(expense);
+
+        return new RecurringExpenseDto
+        {
+            Id = expense.Id,
+            Title = expense.Title,
+            Amount = expense.Amount,
+            Category = expense.Category,
+            DayOfMonth = expense.DayOfMonth,
+            IsActive = expense.IsActive
+        };
+    }
+
+    public async Task<bool> DeleteAsync(int id, string userId)
+    {
+        var expense = await _repository.GetByIdAsync(id);
+        if (expense == null || expense.UserId != userId)
+            return false;
 
         await _repository.DeleteAsync(expense);
+        return true;
     }
 }

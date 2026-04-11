@@ -363,7 +363,10 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Arkadaşlarının şifreleri seninkinden farklı olacağı için bu dosyayı herkes yerel tutmalı
+appsettings.json
 appsettings.Development.json
+appsettings.*.json
+!appsettings.Example.json
 
 # PostgreSQL veya SQLite geçici dosyaları (eğer oluşursa)
 *.db

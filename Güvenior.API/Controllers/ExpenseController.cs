@@ -41,4 +41,34 @@ public class ExpenseController : ControllerBase
         var expenses = await _expenseService.GetByUserIdAsync(userId);
         return Ok(expenses);
     }
+
+    [HttpPatch("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateExpenseDto dto)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var expense = await _expenseService.UpdateAsync(id, userId, dto);
+        if (expense == null)
+            return NotFound("Harcama bulunamadı.");
+
+        return Ok(expense);
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var deleted = await _expenseService.DeleteAsync(id, userId);
+        if (!deleted)
+            return NotFound("Harcama bulunamadı.");
+
+        return NoContent();
+    }
 }

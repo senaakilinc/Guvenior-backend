@@ -38,13 +38,27 @@ public class RecurringExpenseController : ControllerBase
         return Ok(expense);
     }
 
-    [HttpDelete("{id}")]
+    [HttpPatch("{id:int}")]
+    public async Task<IActionResult> Update(int id, UpdateRecurringExpenseDto dto)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+
+        var expense = await _service.UpdateAsync(id, userId, dto);
+        if (expense == null) return NotFound("KayÄ±t bulunamadÄ±.");
+
+        return Ok(expense);
+    }
+
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null) return Unauthorized();
 
-        await _service.DeleteAsync(id, userId);
+        var deleted = await _service.DeleteAsync(id, userId);
+        if (!deleted) return NotFound("KayÄ±t bulunamadÄ±.");
+
         return NoContent();
     }
 }
