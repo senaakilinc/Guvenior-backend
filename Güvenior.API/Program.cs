@@ -59,12 +59,25 @@ builder.Services.AddAuthentication(options =>
 // Authorization
 builder.Services.AddAuthorization();
 
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // DI - Infrastructure services
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // DI - Repositories
 builder.Services.AddScoped<IIncomeRepository, IncomeRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<IRecurringExpenseRepository, RecurringExpenseRepository>();
 builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
 builder.Services.AddScoped<IInsightRepository, InsightRepository>();
 
@@ -72,6 +85,7 @@ builder.Services.AddScoped<IInsightRepository, InsightRepository>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IncomeService>();
 builder.Services.AddScoped<ExpenseService>();
+builder.Services.AddScoped<RecurringExpenseService>();
 builder.Services.AddScoped<BudgetService>();
 
 builder.Services.AddControllers();
@@ -81,7 +95,7 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Güvenior.API",
+        Title = "Guvenior.API",
         Version = "v1"
     });
 
@@ -92,7 +106,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "JWT token giriniz. Örnek: Bearer eyJhbGciOi..."
+        Description = "JWT token giriniz. Ornek: Bearer eyJhbGciOi..."
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -119,11 +133,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors();
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

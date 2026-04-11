@@ -1,4 +1,4 @@
-﻿using Güvenior.Domain.Entities;
+using Güvenior.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +13,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
 
     public DbSet<Income> Incomes => Set<Income>();
     public DbSet<Expense> Expenses => Set<Expense>();
+    public DbSet<RecurringExpense> RecurringExpenses => Set<RecurringExpense>();
     public DbSet<Budget> Budgets => Set<Budget>();
     public DbSet<Insight> Insights => Set<Insight>();
 

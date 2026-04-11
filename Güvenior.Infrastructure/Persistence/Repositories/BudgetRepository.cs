@@ -26,6 +26,12 @@ public class BudgetRepository : IBudgetRepository
             .Where(b => b.UserId == userId)
             .ToListAsync();
     }
+
+    public async Task<Budget?> GetByIdAsync(int id)
+    {
+        return await _context.Budgets.FindAsync(id);
+    }
+
     public async Task<Budget?> GetByUserCategoryAndMonthAsync(string userId, ExpenseCategory category, int month, int year)
     {
         return await _context.Budgets
@@ -38,6 +44,12 @@ public class BudgetRepository : IBudgetRepository
     public async Task UpdateAsync(Budget budget)
     {
         _context.Budgets.Update(budget);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Budget budget)
+    {
+        _context.Budgets.Remove(budget);
         await _context.SaveChangesAsync();
     }
 }
