@@ -13,4 +13,8 @@ public class RecurringExpense : BaseEntity
     public ExpenseCategory Category { get; set; }
     public int DayOfMonth { get; set; }
     public bool IsActive { get; set; } = true;
+
+    // Used to prevent generating the same recurring expense multiple times in the same month.
+    public int? LastGeneratedYear { get; set; }
+    public int? LastGeneratedMonth { get; set; }
 }
