@@ -1,16 +1,21 @@
 using Güvenior.Application.Common.Interfaces;
 using Güvenior.Application.DTOs.Expense;
 using Güvenior.Domain.Entities;
+using ExpenseEntity = Güvenior.Domain.Entities.Expense;
 
 namespace Güvenior.Application.Features.Expense;
 
 public class RecurringExpenseService
 {
     private readonly IRecurringExpenseRepository _repository;
+    private readonly IExpenseRepository _expenseRepository;
 
-    public RecurringExpenseService(IRecurringExpenseRepository repository)
+    public RecurringExpenseService(
+        IRecurringExpenseRepository repository,
+        IExpenseRepository expenseRepository)
     {
         _repository = repository;
+        _expenseRepository = expenseRepository;
     }
 
     public async Task<IEnumerable<RecurringExpenseDto>> GetAllAsync(string userId)
@@ -23,7 +28,9 @@ public class RecurringExpenseService
             Amount = e.Amount,
             Category = e.Category,
             DayOfMonth = e.DayOfMonth,
-            IsActive = e.IsActive
+            IsActive = e.IsActive,
+            LastGeneratedYear = e.LastGeneratedYear,
+            LastGeneratedMonth = e.LastGeneratedMonth,
         });
     }
 
@@ -39,7 +46,9 @@ public class RecurringExpenseService
             Amount = expense.Amount,
             Category = expense.Category,
             DayOfMonth = expense.DayOfMonth,
-            IsActive = expense.IsActive
+            IsActive = expense.IsActive,
+            LastGeneratedYear = expense.LastGeneratedYear,
+            LastGeneratedMonth = expense.LastGeneratedMonth,
         };
     }
 
@@ -64,7 +73,9 @@ public class RecurringExpenseService
             Amount = expense.Amount,
             Category = expense.Category,
             DayOfMonth = expense.DayOfMonth,
-            IsActive = expense.IsActive
+            IsActive = expense.IsActive,
+            LastGeneratedYear = expense.LastGeneratedYear,
+            LastGeneratedMonth = expense.LastGeneratedMonth,
         };
     }
 
@@ -98,7 +109,9 @@ public class RecurringExpenseService
             Amount = expense.Amount,
             Category = expense.Category,
             DayOfMonth = expense.DayOfMonth,
-            IsActive = expense.IsActive
+            IsActive = expense.IsActive,
+            LastGeneratedYear = expense.LastGeneratedYear,
+            LastGeneratedMonth = expense.LastGeneratedMonth,
         };
     }
 
@@ -110,5 +123,48 @@ public class RecurringExpenseService
 
         await _repository.DeleteAsync(expense);
         return true;
+    }
+
+    public async Task<int> GenerateDueExpensesAsync(string userId, DateTime utcNow)
+    {
+        utcNow = DateTime.SpecifyKind(utcNow, DateTimeKind.Utc);
+
+        var recurring = await _repository.GetAllByUserIdAsync(userId);
+        var due = recurring
+            .Where(r => r.IsActive)
+            .Where(r =>
+            {
+                var scheduledDay = Math.Clamp(r.DayOfMonth, 1, DateTime.DaysInMonth(utcNow.Year, utcNow.Month));
+                return utcNow.Day >= scheduledDay;
+            })
+            .ToList();
+
+        var createdCount = 0;
+
+        foreach (var r in due)
+        {
+            if (r.LastGeneratedYear == utcNow.Year && r.LastGeneratedMonth == utcNow.Month)
+                continue;
+
+            var scheduledDay = Math.Clamp(r.DayOfMonth, 1, DateTime.DaysInMonth(utcNow.Year, utcNow.Month));
+            var spentAt = new DateTime(utcNow.Year, utcNow.Month, scheduledDay, 0, 0, 0, DateTimeKind.Utc);
+
+            await _expenseRepository.AddAsync(new ExpenseEntity
+            {
+                UserId = userId,
+                Title = r.Title,
+                Amount = r.Amount,
+                Category = r.Category,
+                SpentAt = spentAt,
+            });
+
+            r.LastGeneratedYear = utcNow.Year;
+            r.LastGeneratedMonth = utcNow.Month;
+            await _repository.UpdateAsync(r);
+
+            createdCount++;
+        }
+
+        return createdCount;
     }
 }

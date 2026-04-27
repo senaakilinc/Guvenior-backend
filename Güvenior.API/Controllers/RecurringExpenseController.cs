@@ -61,4 +61,15 @@ public class RecurringExpenseController : ControllerBase
 
         return NoContent();
     }
+
+    // Generates actual Expense records from active recurring expenses for the current month (idempotent per month).
+    [HttpPost("generate")]
+    public async Task<IActionResult> Generate()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+
+        var createdCount = await _service.GenerateDueExpensesAsync(userId, DateTime.UtcNow);
+        return Ok(new { createdCount });
+    }
 }

@@ -10,4 +10,6 @@ public class RecurringExpenseDto
     public ExpenseCategory Category { get; set; }
     public int DayOfMonth { get; set; }
     public bool IsActive { get; set; }
+    public int? LastGeneratedYear { get; set; }
+    public int? LastGeneratedMonth { get; set; }
 }
