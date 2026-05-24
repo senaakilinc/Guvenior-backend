@@ -54,7 +54,7 @@ public class BudgetService
 
         var existing = await _budgetRepository.GetByUserCategoryAndMonthAsync(userId, nextCategory, nextMonth, nextYear);
         if (existing != null && existing.Id != budget.Id)
-            throw new InvalidOperationException("Bu kategori ve ay i�in zaten bir b�t�e mevcut.");
+            throw new InvalidOperationException("Bu kategori ve ay için zaten bir bütçe mevcut.");
 
         budget.Category = nextCategory;
 
