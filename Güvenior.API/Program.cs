@@ -87,6 +87,7 @@ builder.Services.AddScoped<IncomeService>();
 builder.Services.AddScoped<ExpenseService>();
 builder.Services.AddScoped<RecurringExpenseService>();
 builder.Services.AddScoped<BudgetService>();
+builder.Services.AddScoped<IOpenAIService, OpenAIService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
