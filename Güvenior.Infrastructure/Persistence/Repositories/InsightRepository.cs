@@ -26,4 +26,15 @@ public class InsightRepository : IInsightRepository
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync();
     }
+
+    public async Task<Insight?> GetByIdAsync(int id)
+    {
+        return await _context.Insights.FindAsync(id);
+    }
+
+    public async Task UpdateAsync(Insight insight)
+    {
+        _context.Insights.Update(insight);
+        await _context.SaveChangesAsync();
+    }
 }

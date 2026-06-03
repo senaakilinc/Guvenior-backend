@@ -1,10 +1,12 @@
 ﻿using Güvenior.Application.Common.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Güvenior.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CoachingController : ControllerBase
 {
     private readonly IOpenAIService _openAIService;
