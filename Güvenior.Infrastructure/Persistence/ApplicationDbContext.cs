@@ -16,6 +16,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<RecurringExpense> RecurringExpenses => Set<RecurringExpense>();
     public DbSet<Budget> Budgets => Set<Budget>();
     public DbSet<Insight> Insights => Set<Insight>();
+    public DbSet<FinancialGoal> FinancialGoals => Set<FinancialGoal>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

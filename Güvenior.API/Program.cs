@@ -3,7 +3,10 @@ using Güvenior.Application.Common.Interfaces;
 using Güvenior.Application.Features.Auth;
 using Güvenior.Application.Features.Budget;
 using Güvenior.Application.Features.Expense;
+using Güvenior.Application.Features.FinancialGoal;
 using Güvenior.Application.Features.Income;
+using Güvenior.Application.Features.Insight;
+using Güvenior.Application.Features.MonthlyReport;
 using Güvenior.Domain.Entities;
 using Güvenior.Infrastructure.Persistence;
 using Güvenior.Infrastructure.Persistence.Repositories;
@@ -73,6 +76,7 @@ builder.Services.AddCors(options =>
 // DI - Infrastructure services
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IMarketAssumptionService, MarketAssumptionService>();
 
 // DI - Repositories
 builder.Services.AddScoped<IIncomeRepository, IncomeRepository>();
@@ -80,6 +84,7 @@ builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IRecurringExpenseRepository, RecurringExpenseRepository>();
 builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
 builder.Services.AddScoped<IInsightRepository, InsightRepository>();
+builder.Services.AddScoped<IFinancialGoalRepository, FinancialGoalRepository>();
 
 // DI - Application services
 builder.Services.AddScoped<AuthService>();
@@ -87,6 +92,9 @@ builder.Services.AddScoped<IncomeService>();
 builder.Services.AddScoped<ExpenseService>();
 builder.Services.AddScoped<RecurringExpenseService>();
 builder.Services.AddScoped<BudgetService>();
+builder.Services.AddScoped<InsightService>();
+builder.Services.AddScoped<FinancialGoalService>();
+builder.Services.AddScoped<MonthlyReportService>();
 builder.Services.AddScoped<IOpenAIService, OpenAIService>();
 
 builder.Services.AddControllers();
