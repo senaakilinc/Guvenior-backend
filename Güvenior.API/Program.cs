@@ -136,6 +136,22 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// Seed demo data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        var userManager = services.GetRequiredService<UserManager<User>>();
+        await DatabaseInitializer.SeedDemoDataAsync(context, userManager);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error seeding demo data: {ex.Message}");
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
